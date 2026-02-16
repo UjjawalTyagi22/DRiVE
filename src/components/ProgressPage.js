@@ -1,505 +1,280 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  AcademicCapIcon, 
-  ChartBarIcon, 
-  UserCircleIcon, 
-  BellIcon,
-  ArrowRightOnRectangleIcon,
-  Bars3Icon,
-  XMarkIcon,
-  TrophyIcon,
-  CalendarIcon,
+import { useAuth } from '../contexts/AuthContext';
+import {
   ClockIcon,
-  CheckCircleIcon,
   StarIcon,
   FireIcon,
   BookOpenIcon,
-  ChevronRightIcon,
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
-import { 
-  CheckCircleIcon as CheckCircleIconSolid,
-  StarIcon as StarIconSolid 
-} from '@heroicons/react/24/solid';
+import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid';
+import { Link } from 'react-router-dom';
+import Certificate from './Certificate';
 
 const ProgressPage = () => {
-  const [user] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    joinDate: "March 2024",
-    totalModules: 12,
-    completedModules: 7,
-    currentStreak: 5,
-    longestStreak: 12,
-    totalHours: 24,
-    points: 2450,
-    certificates: 7,
-    rank: "Advanced Learner"
-  });
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedTimeRange, setSelectedTimeRange] = useState('all');
+  const { user } = useAuth();
   const [expandedModule, setExpandedModule] = useState(null);
+  const [selectedCertifiedModule, setSelectedCertifiedModule] = useState(null);
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: UserCircleIcon },
-    { name: 'Modules', href: '/modules', icon: AcademicCapIcon },
-    { name: 'Profile', href: '/profile', icon: UserCircleIcon },
-  ];
+  // Use user data if available, otherwise default to initial state
+  const currentModuleProgress = user?.moduleProgress || [];
+  const currentAchievements = user?.achievements || [];
 
-  const handleLogout = () => {
-    window.location.href = '/';
-  };
-
-  // Progress data for different time ranges
-  const progressData = {
-    all: [
-      { month: 'Mar', completed: 1, hours: 2 },
-      { month: 'Apr', completed: 2, hours: 4 },
-      { month: 'May', completed: 1, hours: 3 },
-      { month: 'Jun', completed: 2, hours: 5 },
-      { month: 'Jul', completed: 1, hours: 4 },
-      { month: 'Aug', completed: 0, hours: 2 },
-      { month: 'Sep', completed: 0, hours: 4 }
-    ]
-  };
-
-  const moduleProgress = [
-    {
-      id: 1,
-      title: "Earthquake Safety",
-      category: "Natural Disasters",
-      progress: 100,
-      completedDate: "2024-09-15",
-      timeSpent: "2h 15m",
-      score: 95,
-      certificate: true,
-      lessons: [
-        { name: "Understanding Earthquakes", completed: true, score: 92 },
-        { name: "Drop, Cover, Hold", completed: true, score: 98 },
-        { name: "Building Safety", completed: true, score: 95 },
-        { name: "Post-Earthquake Actions", completed: true, score: 93 }
-      ]
-    },
-    {
-      id: 2,
-      title: "Flood Response",
-      category: "Natural Disasters", 
-      progress: 100,
-      completedDate: "2024-09-10",
-      timeSpent: "1h 45m",
-      score: 88,
-      certificate: true,
-      lessons: [
-        { name: "Flood Warnings", completed: true, score: 90 },
-        { name: "Evacuation Routes", completed: true, score: 85 },
-        { name: "Water Safety", completed: true, score: 89 }
-      ]
-    },
-    {
-      id: 3,
-      title: "Fire Safety",
-      category: "Emergency Response",
-      progress: 75,
-      completedDate: null,
-      timeSpent: "2h 30m",
-      score: 0,
-      certificate: false,
-      lessons: [
-        { name: "Fire Prevention", completed: true, score: 94 },
-        { name: "Fire Extinguishers", completed: true, score: 87 },
-        { name: "Evacuation Plans", completed: true, score: 91 },
-        { name: "Smoke Safety", completed: false, score: 0 }
-      ]
-    },
-    {
-      id: 4,
-      title: "First Aid Basics",
-      category: "Medical Emergency",
-      progress: 60,
-      completedDate: null,
-      timeSpent: "1h 20m",
-      score: 0,
-      certificate: false,
-      lessons: [
-        { name: "Basic First Aid", completed: true, score: 89 },
-        { name: "CPR Techniques", completed: true, score: 92 },
-        { name: "Wound Care", completed: false, score: 0 },
-        { name: "Emergency Response", completed: false, score: 0 }
-      ]
-    },
-    {
-      id: 5,
-      title: "Workplace Safety",
-      category: "Professional Safety",
-      progress: 25,
-      completedDate: null,
-      timeSpent: "45m",
-      score: 0,
-      certificate: false,
-      lessons: [
-        { name: "Hazard Identification", completed: true, score: 86 },
-        { name: "Safety Protocols", completed: false, score: 0 },
-        { name: "Emergency Procedures", completed: false, score: 0 },
-        { name: "Incident Reporting", completed: false, score: 0 }
-      ]
-    }
-  ];
-
-  const achievements = [
-    { id: 1, title: 'First Module Completed', earned: true, date: '2024-03-15', icon: '🎯' },
-    { id: 2, title: 'Week Streak', earned: true, date: '2024-03-22', icon: '🔥' },
-    { id: 3, title: '5 Modules Complete', earned: true, date: '2024-04-10', icon: '📚' },
-    { id: 4, title: '10 Day Streak', earned: true, date: '2024-04-18', icon: '⚡' },
-    { id: 5, title: 'Perfect Score', earned: true, date: '2024-05-02', icon: '⭐' },
-    { id: 6, title: '20 Hours Studied', earned: true, date: '2024-05-15', icon: '⏰' },
-    { id: 7, title: 'Emergency Expert', earned: false, date: null, icon: '🚨' },
-    { id: 8, title: 'All Modules Complete', earned: false, date: null, icon: '🏆' }
-  ];
-
-  const getProgressColor = (progress) => {
-    if (progress === 100) return 'bg-green-500';
-    if (progress >= 75) return 'bg-blue-500';
-    if (progress >= 50) return 'bg-yellow-500';
-    return 'bg-gray-300';
-  };
-
-  const getScoreColor = (score) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 80) return 'text-blue-600';
-    if (score >= 70) return 'text-yellow-600';
-    return 'text-red-600';
-  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/dashboard" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">D</span>
-                </div>
-                <span className="text-2xl font-bold text-gray-900">DRiVE</span>
-              </Link>
-              <span className="hidden md:block text-sm text-gray-500 ml-2">
-                Disaster Resilience in Virtual Education
-              </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <span className="text-blue-600 bg-blue-50 px-3 py-2 rounded-md text-sm font-medium">
-                Progress
-              </span>
-            </div>
-
-            {/* User Menu & Actions */}
-            <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-                <BellIcon className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-
-              <div className="hidden md:flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                  <UserCircleIcon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-500">Member since {user.joinDate}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className="hidden md:flex items-center space-x-1 text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-gray-700 hover:text-blue-600"
-              >
-                {isMobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden border-t bg-white">
-              <div className="px-2 pt-2 pb-3 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-                <span className="text-blue-600 bg-blue-50 block px-3 py-2 rounded-md text-base font-medium">
-                  Progress
-                </span>
-              </div>
-            </div>
-          )}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Page Title */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Learning Progress</h1>
+          <p className="text-gray-600">Track your disaster preparedness journey and achievements</p>
         </div>
-      </nav>
-
-      {/* Main Content - NO SEPARATE HEADER SECTION */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Title at the top of content */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Learning Progress</h1>
-            <p className="text-gray-600">Track your disaster preparedness journey and achievements</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-              {user.rank}
-            </span>
-          </div>
+        <div className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-2.5 rounded-2xl shadow-lg shadow-blue-500/20 font-bold text-sm">
+          <span>Rank: {user?.rank || 'Beginner'}</span>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{user.completedModules}</div>
-                <div className="text-gray-600 text-sm">Modules Completed</div>
-              </div>
-              
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <div className="text-3xl font-bold text-green-600 mb-2">{user.totalHours}h</div>
-                <div className="text-gray-600 text-sm">Hours Studied</div>
-              </div>
-              
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <div className="text-3xl font-bold text-orange-600 mb-2">{user.currentStreak}</div>
-                <div className="text-gray-600 text-sm">Current Streak</div>
-              </div>
-              
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">{user.certificates}</div>
-                <div className="text-gray-600 text-sm">Certificates</div>
-              </div>
-            </div>
-
-            {/* Overall Progress */}
-            <div className="bg-white rounded-xl shadow-sm p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Overall Progress</h2>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {Math.round((user.completedModules / user.totalModules) * 100)}%
-                  </div>
-                  <div className="text-gray-500 text-sm">Complete</div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-8">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { label: 'Completed', value: user?.modulesCompleted || 0, icon: BookOpenIcon, color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Hours', value: `${user?.totalHours || 0}h`, icon: ClockIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { label: 'Streak', value: user?.currentStreak || 0, icon: FireIcon, color: 'text-orange-600', bg: 'bg-orange-50' },
+              { label: 'Points', value: user?.totalPoints || 0, icon: StarIcon, color: 'text-indigo-600', bg: 'bg-indigo-50' }
+            ].map((stat, i) => (
+              <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 text-center">
+                <div className={`${stat.bg} w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3`}>
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
                 </div>
+                <div className="text-2xl font-black text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{stat.label}</div>
               </div>
-              
-              <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-                <div 
-                  className="bg-gradient-to-r from-blue-500 to-cyan-500 h-4 rounded-full transition-all duration-1000"
-                  style={{ width: `${(user.completedModules / user.totalModules) * 100}%` }}
-                ></div>
-              </div>
-              
-              <div className="text-gray-600 text-center">
-                {user.completedModules} of {user.totalModules} modules completed
-              </div>
+            ))}
+          </div>
+
+          {/* Overall Progress */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold text-gray-900">Curriculum Mastery</h2>
+              <span className="text-2xl font-black text-blue-600">{user?.overallProgress || 0}%</span>
             </div>
 
-            {/* Module Progress */}
-            <div className="bg-white rounded-xl shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Module Progress</h2>
-              
-              <div className="space-y-4">
-                {moduleProgress.map((module) => (
-                  <div key={module.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div 
-                      className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+            <div className="w-full bg-gray-50 rounded-full h-4 mb-6 p-1 border border-gray-100">
+              <div
+                className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-1000 min-w-[5%]"
+                style={{ width: `${user?.overallProgress || 0}%` }}
+              ></div>
+            </div>
+
+            <div className="flex justify-between items-center text-sm font-bold text-gray-500">
+              <span>{user?.modulesCompleted || 0} Modules Completed</span>
+              <span className="text-gray-300">12 Total Modules</span>
+            </div>
+          </div>
+
+          {/* Detailed Module Status */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-8">Module Breakdown</h2>
+
+            <div className="space-y-4">
+              {currentModuleProgress.length > 0 ? (
+                currentModuleProgress.map((module) => (
+                  <div key={module.id} className="group border border-gray-100 rounded-3xl overflow-hidden transition-all hover:shadow-md">
+                    <div
+                      className="p-6 cursor-pointer bg-white group-hover:bg-gray-50/50 transition-colors"
                       onClick={() => setExpandedModule(expandedModule === module.id ? null : module.id)}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">{module.title}</h3>
-                            {module.certificate && (
-                              <div className="flex items-center space-x-1 bg-green-100 px-2 py-1 rounded-full">
-                                <CheckCircleIconSolid className="w-4 h-4 text-green-600" />
-                                <span className="text-green-700 text-xs font-medium">Certified</span>
-                              </div>
+                          <div className="flex items-center flex-wrap gap-2 mb-2">
+                            <h3 className="text-lg font-bold text-gray-900">{module.title}</h3>
+                            {module.progress === 100 && (
+                              <span className="flex items-center bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                <CheckCircleIconSolid className="w-3 h-3 mr-1" />
+                                Certified
+                              </span>
                             )}
                           </div>
-                          
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+
+                          <div className="flex items-center gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                             <span>{module.category}</span>
-                            <span>•</span>
-                            <span>{module.timeSpent}</span>
-                            {module.completedDate && (
-                              <>
-                                <span>•</span>
-                                <span>Completed {new Date(module.completedDate).toLocaleDateString()}</span>
-                              </>
-                            )}
-                          </div>
-                          
-                          {/* Progress Bar */}
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full ${getProgressColor(module.progress)} transition-all duration-500`}
-                              style={{ width: `${module.progress}%` }}
-                            ></div>
+                            <span className="w-1.5 h-1.5 bg-gray-200 rounded-full"></span>
+                            <span>{module.timeSpent} spent</span>
                           </div>
                         </div>
-                        
-                        <div className="ml-6 text-right">
-                          <div className="text-2xl font-bold text-gray-900">{module.progress}%</div>
-                          {module.score > 0 && (
-                            <div className={`text-sm font-medium ${getScoreColor(module.score)}`}>
-                              Score: {module.score}%
+
+                        <div className="flex items-center gap-6">
+                          <div className="text-right">
+                            <div className={`text-xl font-black ${module.progress === 100 ? 'text-emerald-600' : 'text-gray-900'}`}>
+                              {module.progress}%
                             </div>
-                          )}
-                        </div>
-                        
-                        <div className="ml-4">
-                          {expandedModule === module.id ? (
-                            <ChevronUpIcon className="w-5 h-5 text-gray-400" />
-                          ) : (
-                            <ChevronDownIcon className="w-5 h-5 text-gray-400" />
-                          )}
+                            {module.score > 0 && <div className="text-[10px] font-black text-gray-400 uppercase">Avg Score: {module.score}%</div>}
+                          </div>
+                          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${expandedModule === module.id ? 'bg-blue-600 text-white' : 'bg-gray-50 text-gray-400'}`}>
+                            {expandedModule === module.id ? <ChevronUpIcon className="w-5 h-5" /> : <ChevronDownIcon className="w-5 h-5" />}
+                          </div>
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Expanded Lessons */}
+
                     {expandedModule === module.id && (
-                      <div className="border-t bg-gray-50 p-6">
-                        <h4 className="font-semibold text-gray-900 mb-4">Lessons</h4>
-                        <div className="space-y-3">
-                          {module.lessons.map((lesson, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg">
-                              <div className="flex items-center space-x-3">
+                      <div className="px-8 pb-8 pt-2 bg-gray-50/30">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {module.lessons.map((lesson, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
+                              <div className="flex items-center gap-3">
                                 {lesson.completed ? (
-                                  <CheckCircleIconSolid className="w-5 h-5 text-green-500" />
+                                  <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center">
+                                    <CheckCircleIconSolid className="w-4 h-4 text-white" />
+                                  </div>
                                 ) : (
-                                  <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
+                                  <div className="w-6 h-6 border-2 border-dashed border-gray-200 rounded-lg"></div>
                                 )}
-                                <span className={`font-medium ${lesson.completed ? 'text-gray-900' : 'text-gray-500'}`}>
+                                <span className={`text-sm font-bold ${lesson.completed ? 'text-gray-900' : 'text-gray-400'}`}>
                                   {lesson.name}
                                 </span>
                               </div>
-                              
-                              {lesson.completed && lesson.score > 0 && (
-                                <span className={`text-sm font-medium ${getScoreColor(lesson.score)}`}>
-                                  {lesson.score}%
-                                </span>
-                              )}
+                              {lesson.score > 0 && <span className="text-xs font-black text-blue-600">{lesson.score}%</span>}
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Achievements */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Achievements</h3>
-              <div className="grid grid-cols-4 gap-3">
-                {achievements.map((achievement) => (
-                  <div key={achievement.id} className="text-center">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg mb-2 ${
-                      achievement.earned ? 'bg-yellow-100' : 'bg-gray-100'
-                    }`}>
-                      <span className={achievement.earned ? '' : 'grayscale opacity-50'}>
-                        {achievement.icon}
-                      </span>
-                    </div>
-                    <div className={`text-xs font-medium ${achievement.earned ? 'text-gray-900' : 'text-gray-400'}`}>
-                      {achievement.title}
-                    </div>
-                    {achievement.earned && achievement.date && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        {new Date(achievement.date).toLocaleDateString()}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Study Streak */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Study Streak</h3>
-              <div className="text-center">
-                <div className="text-4xl mb-2">🔥</div>
-                <div className="text-2xl font-bold text-orange-500 mb-1">{user.currentStreak} days</div>
-                <div className="text-gray-600 text-sm mb-4">Current streak</div>
-                <div className="text-gray-500 text-xs">
-                  Best: {user.longestStreak} days
+                ))
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                  <BookOpenIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 font-bold">No modules started yet.</p>
+                  <Link to="/modules" className="text-blue-600 text-sm font-bold mt-2 inline-block hover:underline">
+                    Browse Modules
+                  </Link>
                 </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <Link 
-                  to="/modules" 
-                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
-                >
-                  <div className="flex items-center">
-                    <AcademicCapIcon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 mr-3" />
-                    <span className="text-gray-900 group-hover:text-blue-600">Continue Learning</span>
-                  </div>
-                  <ChevronRightIcon className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-                </Link>
-                
-                <Link 
-                  to="/profile" 
-                  className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group"
-                >
-                  <div className="flex items-center">
-                    <UserCircleIcon className="w-5 h-5 text-gray-600 group-hover:text-blue-600 mr-3" />
-                    <span className="text-gray-900 group-hover:text-blue-600">Edit Profile</span>
-                  </div>
-                  <ChevronRightIcon className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-                </Link>
-              </div>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Achievements Preview */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-6">Badges Earned</h3>
+            <div className="grid grid-cols-3 gap-3">
+              {currentAchievements.length > 0 ? (
+                currentAchievements.slice(0, 6).map((achievement) => (
+                  <div key={achievement.id} className="group relative">
+                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl transition-all group-hover:scale-110 group-hover:bg-blue-50">
+                      {achievement.icon}
+                    </div>
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[8px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      {achievement.title}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-4 text-gray-400 text-xs font-bold uppercase tracking-widest">
+                  No badges yet
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action Cards */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-center">
+            <div className="w-16 h-16 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center mx-auto mb-4">
+              <FireIcon className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{user?.currentStreak || 0} Day Streak!</h3>
+            <p className="text-sm text-gray-500 mb-6">Keep learning to maintain your momentum.</p>
+            <Link to="/modules" className="block w-full bg-blue-600 text-white font-bold py-3 rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20">
+              Continue Learning
+            </Link>
+          </div>
+        </div>
       </div>
+
+      {/* Certificates Section */}
+      <div className="mt-12">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+              <StarIcon className="w-8 h-8 mr-3 text-amber-500" />
+              Verified Certificates
+            </h2>
+            <Link to="/modules" className="text-blue-600 text-sm font-bold hover:underline">Earn More Certificates</Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentModuleProgress.filter(m => m.progress === 100).length > 0 ? (
+              currentModuleProgress.filter(m => m.progress === 100).map((module) => (
+                <div key={module.id} className="group cursor-pointer" onClick={() => setSelectedCertifiedModule(module)}>
+                  <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 transition-all group-hover:bg-blue-50 group-hover:border-blue-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                        <AwardIcon className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Verified</span>
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-700">{module.title}</h3>
+                    <p className="text-xs text-gray-500 mb-4">Issued on Oct 20, 2024</p>
+                    <div className="flex items-center text-blue-600 text-xs font-bold uppercase tracking-widest">
+                      <span>View Certificate</span>
+                      <ChevronRightIcon className="w-4 h-4 ml-1" />
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full py-12 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                <StarIcon className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                <p className="text-gray-500 font-bold">Complete any module to earn your professional certificate.</p>
+                <Link to="/modules" className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm">Start a Module</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Certificate Viewer Modal */}
+      {selectedCertifiedModule && (
+        <div className="fixed inset-0 bg-gray-900/90 backdrop-blur-sm z-[100] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden relative">
+            <button
+              onClick={() => setSelectedCertifiedModule(null)}
+              className="absolute top-6 right-6 text-gray-400 hover:text-gray-900 z-10 p-2 hover:bg-gray-100 rounded-full transition-all"
+            >
+              <ChevronDownIcon className="w-6 h-6" />
+            </button>
+            <div className="py-12">
+              <Certificate
+                userName={`${user?.firstName || ''} ${user?.lastName || 'Learner'}`}
+                moduleTitle={selectedCertifiedModule.title}
+                date="October 20, 2024"
+                certificateId={`SAFE-2024-${selectedCertifiedModule.id}-VERIFIED`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const AwardIcon = ({ className }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+  </svg>
+);
+
+const ChevronRightIcon = ({ className }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  </svg>
+);
 
 export default ProgressPage;

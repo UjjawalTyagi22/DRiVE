@@ -1,14 +1,28 @@
 import React from 'react';
 import { Clock, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Modal = ({ module, onClose }) => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
   const getLevelColor = (level) => {
-    switch(level) {
+    switch (level) {
       case 'beginner': return 'bg-green-100 text-green-700';
       case 'intermediate': return 'bg-yellow-100 text-yellow-700';
       case 'advanced': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
+  };
+
+  const handleStart = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      navigate(`/modules/${module.id}`);
+    }
+    onClose();
   };
 
   return (
@@ -22,20 +36,20 @@ const Modal = ({ module, onClose }) => {
                 {module.level}
               </span>
             </div>
-            <button 
+            <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
             >
               ✕
             </button>
           </div>
-          
+
           <div className={`h-48 bg-gradient-to-br ${module.color} rounded-xl mb-6`}></div>
-          
+
           <p className="text-gray-700 mb-6 leading-relaxed">
             {module.description}
           </p>
-          
+
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="flex items-center space-x-2">
               <Clock className="w-5 h-5 text-gray-400" />
@@ -46,9 +60,12 @@ const Modal = ({ module, onClose }) => {
               <span>{module.enrolled}</span>
             </div>
           </div>
-          
+
           <div className="flex space-x-4">
-            <button className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+            <button
+              onClick={handleStart}
+              className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
               {module.progress === 0 ? 'Start Learning' : 'Continue'}
             </button>
             <button className="px-6 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-colors">

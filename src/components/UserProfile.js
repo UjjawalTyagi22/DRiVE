@@ -1,63 +1,64 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  UserCircleIcon, 
-  EnvelopeIcon, 
-  PhoneIcon, 
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import {
+  UserCircleIcon,
+  EnvelopeIcon,
+  PhoneIcon,
   CalendarIcon,
   MapPinIcon,
   PencilIcon,
   CameraIcon,
   BellIcon,
-  ArrowRightOnRectangleIcon,
-  Bars3Icon,
-  XMarkIcon,
-  AcademicCapIcon,
   ShieldCheckIcon,
   DocumentArrowDownIcon,
-  TrashIcon
+  TrashIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 
 const UserProfile = () => {
-  const [user] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    joinDate: "March 2024"
-  });
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, updateUserProfile, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  // File input refs
+  const profileInputRef = React.useRef(null);
+  const coverInputRef = React.useRef(null);
+
   const [formData, setFormData] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john@example.com',
-    phone: '+1 (555) 123-4567',
-    dateOfBirth: '1995-08-15',
-    location: 'New York, USA',
-    bio: 'Passionate about disaster preparedness and emergency response. Currently working towards becoming a certified emergency responder.',
-    organization: 'ABC University',
-    role: 'Student'
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    location: '',
+    bio: 'Tell us about yourself...',
+    organization: '',
+    role: 'Student',
+    profilePhoto: null,
+    coverPhoto: null
   });
 
-  // FIXED: Corrected the achievements array syntax
-  const [achievements] = useState([
-    { id: 1, title: 'First Module Completed', date: '2024-03-15', icon: '🎯', description: 'Completed your first disaster response module' },
-    { id: 2, title: 'Week Streak', date: '2024-03-22', icon: '🔥', description: 'Maintained a 7-day learning streak' },
-    { id: 3, title: 'Emergency Response Expert', date: '2024-04-10', icon: '🚨', description: 'Mastered emergency response protocols' },
-    { id: 4, title: 'Community Helper', date: '2024-04-18', icon: '🤝', description: 'Helped fellow learners in forums' },
-    { id: 5, title: 'Perfect Score', date: '2024-05-02', icon: '⭐', description: 'Achieved 100% in a module assessment' },
-    { id: 6, title: 'Safety Champion', date: '2024-05-15', icon: '🛡️', description: 'Completed all safety training modules' }
-  ]);
+  // Sync with auth user data
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        location: user.location || '',
+        bio: user.bio || 'Tell us about yourself...',
+        dateOfBirth: user.dateOfBirth || '',
+        organization: user.organization || '',
+        role: user.role || 'Student',
+        profilePhoto: user.profilePhoto || null,
+        coverPhoto: user.coverPhoto || null
+      }));
+    }
+  }, [user]);
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: UserCircleIcon },
-    { name: 'Modules', href: '/modules', icon: AcademicCapIcon },
-    { name: 'Profile', href: '/profile', icon: UserCircleIcon }
-  ];
-
-  const handleLogout = () => {
-    window.location.href = '/';
-  };
+  const userAchievements = user?.achievements || [];
 
   const handleInputChange = (e) => {
     setFormData({
@@ -66,375 +67,472 @@ const UserProfile = () => {
     });
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    console.log('Saving profile:', formData);
+  const handleFileChange = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File is too large. Please select an image under 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Create an image to compress it if needed
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          const MAX_HEIGHT = 1200;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to 70% quality JPEG Base64
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+          setFormData(prev => ({
+            ...prev,
+            [type]: compressedBase64
+          }));
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = async () => {
+    const result = await updateUserProfile(formData);
+    if (result.success) {
+      setIsEditing(false);
+      alert('Profile updated and saved successfully!');
+    } else {
+      alert(`Failed to save profile: ${result.message}`);
+    }
+  };
+
+  const handleAction = async (action) => {
+    switch (action) {
+      case 'Privacy Settings':
+        alert('Your profile privacy is currently set to Private. Only you can see your learning progress.');
+        break;
+
+      case 'Notifications':
+        setNotificationsEnabled(!notificationsEnabled);
+        alert(`Notifications ${!notificationsEnabled ? 'Enabled' : 'Disabled'}!`);
+        break;
+
+      case 'Data Download':
+        try {
+          const exportData = {
+            profile: {
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              location: user.location,
+              bio: user.bio,
+              joined: user.createdAt
+            },
+            stats: {
+              modulesCompleted: user.modulesCompleted,
+              totalHours: user.totalHours,
+              currentStreak: user.currentStreak,
+              totalPoints: user.totalPoints,
+              overallProgress: user.overallProgress
+            },
+            learningProgress: user.moduleProgress || []
+          };
+
+          const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `DRiVE_Learning_Data_${user.firstName}_${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        } catch (error) {
+          alert('Failed to generate data download. Please try again.');
+        }
+        break;
+
+      case 'Delete Account':
+        const confirmDelete = window.confirm(
+          'ARE YOU SURE? This will permanently delete your DRiVE account, all your progress, and earned certificates. This action cannot be undone.'
+        );
+        if (confirmDelete) {
+          // In a real app, we'd call a backend delete endpoint
+          alert('Account deletion request received. You will be logged out now.');
+          logout();
+        }
+        break;
+
+      default:
+        alert(`${action} functionality coming soon!`);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/dashboard" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">D</span>
-                </div>
-                <span className="text-2xl font-bold text-gray-900">DRiVE</span>
-              </Link>
-              <span className="hidden md:block text-sm text-gray-500 ml-2">
-                Disaster Resilience in Virtual Education
-              </span>
-            </div>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Hidden File Inputs */}
+      <input
+        type="file"
+        ref={profileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={(e) => handleFileChange(e, 'profilePhoto')}
+      />
+      <input
+        type="file"
+        ref={coverInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={(e) => handleFileChange(e, 'coverPhoto')}
+      />
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    item.name === 'Profile' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600'
-                  }`}
+      {/* Page Title */}
+      <div className="mb-8 font-inter">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile</h1>
+        <p className="text-gray-600">Manage your account information and preferences</p>
+      </div>
+
+      {/* Profile Header Card */}
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+        {/* Cover Photo */}
+        <div
+          className="h-40 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden"
+          style={formData.coverPhoto ? { backgroundImage: `url(${formData.coverPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+        >
+          <button
+            onClick={() => coverInputRef.current?.click()}
+            className="absolute top-4 right-4 bg-white/20 backdrop-blur-md text-white p-2 rounded-xl hover:bg-white/30 transition-all z-10"
+          >
+            <CameraIcon className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Profile Info */}
+        <div className="relative px-8 pb-8">
+          <div className="flex items-end justify-between -mt-16 mb-6">
+            <div className="relative">
+              <div className="w-32 h-32 bg-white rounded-3xl p-1 shadow-2xl">
+                <div
+                  className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 rounded-[1.25rem] flex items-center justify-center text-white text-4xl font-bold overflow-hidden"
+                  style={formData.profilePhoto ? { backgroundImage: `url(${formData.profilePhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
                 >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-
-            {/* User Menu & Actions */}
-            <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-                <BellIcon className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-
-              <div className="hidden md:flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                  <UserCircleIcon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-500">Member since {user.joinDate}</p>
+                  {!formData.profilePhoto && (formData.firstName?.charAt(0) || <UserCircleIcon className="w-16 h-16" />)}
                 </div>
               </div>
-
               <button
-                onClick={handleLogout}
-                className="hidden md:flex items-center space-x-1 text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={() => profileInputRef.current?.click()}
+                className="absolute bottom-2 right-2 bg-blue-600 text-white p-2 rounded-xl shadow-lg hover:bg-blue-700 transition-all transform hover:scale-110 z-20"
               >
-                <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-gray-700 hover:text-blue-600"
-              >
-                {isMobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+                <CameraIcon className="w-4 h-4" />
               </button>
             </div>
-          </div>
 
-          {/* Mobile Navigation */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden border-t bg-white">
-              <div className="px-2 pt-2 pb-3 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`block px-3 py-2 rounded-md text-base font-medium ${
-                      item.name === 'Profile' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-                
-                <div className="pt-4 pb-3 border-t border-gray-200">
-                  <div className="flex items-center px-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                      <UserCircleIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-base font-medium text-gray-800">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
-                    Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Profile </h1>
-          <p className="text-gray-600">Manage your account information and preferences</p>
-        </div>
-
-        {/* Profile Header Card */}
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
-          {/* Cover Photo */}
-          <div className="h-32 bg-gradient-to-r from-blue-500 to-cyan-500 relative">
-            <button className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white p-2 rounded-lg hover:bg-white/30 transition-colors">
-              <CameraIcon className="w-5 h-5" />
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="bg-white border border-gray-200 text-gray-700 px-6 py-2.5 rounded-xl font-semibold hover:bg-gray-50 transition-all flex items-center shadow-sm"
+            >
+              <PencilIcon className="w-4 h-4 mr-2 text-blue-600" />
+              {isEditing ? 'Cancel Edit' : 'Edit Profile'}
             </button>
           </div>
 
-          {/* Profile Info */}
-          <div className="relative px-8 pb-6">
-            <div className="flex items-end justify-between -mt-12 mb-4">
-              <div className="relative">
-                <div className="w-24 h-24 bg-white rounded-full p-2 shadow-lg">
-                  <div className="w-full h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                    <UserCircleIcon className="w-12 h-12 text-white" />
-                  </div>
+          <div className="max-w-3xl">
+            <h2 className="text-3xl font-bold text-gray-900 mb-1">
+              {formData.firstName} {formData.lastName}
+            </h2>
+            <p className="text-gray-500 font-medium mb-4">DRiVE Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '2024'}</p>
+            <p className="text-gray-600 leading-relaxed mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100 italic">
+              "{formData.bio}"
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
+              <div className="flex items-center p-3 bg-white border border-gray-50 rounded-2xl shadow-sm">
+                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mr-3">
+                  <EnvelopeIcon className="w-5 h-5 text-blue-600" />
                 </div>
-                <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-1.5 rounded-full hover:bg-blue-600 transition-colors">
-                  <CameraIcon className="w-3 h-3" />
-                </button>
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Email</p>
+                  <p className="font-semibold text-gray-900 truncate">{formData.email}</p>
+                </div>
               </div>
-
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center text-sm"
-              >
-                <PencilIcon className="w-4 h-4 mr-2" />
-                {isEditing ? 'Cancel' : 'Edit'}
-              </button>
-            </div>
-
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {formData.firstName} {formData.lastName}
-              </h2>
-              <p className="text-gray-600 mb-4 text-sm">{formData.bio}</p>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <EnvelopeIcon className="w-4 h-4 mr-2 text-gray-400" />/``
-                  <span className="truncate">{formData.email}</span>
+              <div className="flex items-center p-3 bg-white border border-gray-50 rounded-2xl shadow-sm">
+                <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center mr-3">
+                  <PhoneIcon className="w-5 h-5 text-indigo-600" />
                 </div>
-                <div className="flex items-center">
-                  <PhoneIcon className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>{formData.phone}</span>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Phone</p>
+                  <p className="font-semibold text-gray-900">{formData.phone || 'N/A'}</p>
                 </div>
-                <div className="flex items-center">
-                  <MapPinIcon className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>{formData.location}</span>
+              </div>
+              <div className="flex items-center p-3 bg-white border border-gray-50 rounded-2xl shadow-sm">
+                <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center mr-3">
+                  <MapPinIcon className="w-5 h-5 text-purple-600" />
                 </div>
-                <div className="flex items-center">
-                  <CalendarIcon className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Born {new Date(formData.dateOfBirth).getFullYear()}</span>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Location</p>
+                  <p className="font-semibold text-gray-900">{formData.location || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 bg-white border border-gray-50 rounded-2xl shadow-sm">
+                <div className="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center mr-3">
+                  <CalendarIcon className="w-5 h-5 text-pink-600" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">Born</p>
+                  <p className="font-semibold text-gray-900">{formData.dateOfBirth ? new Date(formData.dateOfBirth).getFullYear() : 'N/A'}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            {/* Edit Form */}
-            {isEditing && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Edit Profile</h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                    <input
-                      type="text"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={formData.dateOfBirth}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                    <input
-                      type="text"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                    <textarea
-                      name="bio"
-                      rows="3"
-                      value={formData.bio}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end space-x-3 mt-6">
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSave}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Learning Statistics */}
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Learning Statistics</h3>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-blue-50 rounded-xl">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">7</div>
-                  <div className="text-gray-600 text-sm">Modules Completed</div>
-                </div>
-                
-                <div className="text-center p-4 bg-green-50 rounded-xl">
-                  <div className="text-2xl font-bold text-green-600 mb-1">24</div>
-                  <div className="text-gray-600 text-sm">Hours Learned</div>
-                </div>
-                
-                <div className="text-center p-4 bg-orange-50 rounded-xl">
-                  <div className="text-2xl font-bold text-orange-600 mb-1">5</div>
-                  <div className="text-gray-600 text-sm">Day Streak</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Account Settings */}
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Account Settings</h3>
-              <div className="space-y-3">
-                <button className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors text-left">
-                  <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900 text-sm">Privacy Settings</div>
-                    <div className="text-xs text-gray-500">Manage your privacy preferences</div>
-                  </div>
-                </button>
-                
-                <button className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors text-left">
-                  <BellIcon className="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900 text-sm">Notification Preferences</div>
-                    <div className="text-xs text-gray-500">Control email and push notifications</div>
-                  </div>
-                </button>
-                
-                <button className="w-full flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors text-left">
-                  <DocumentArrowDownIcon className="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div className="font-medium text-gray-900 text-sm">Download Data</div>
-                    <div className="text-xs text-gray-500">Export your account data</div>
-                  </div>
-                </button>
-                
-                <button className="w-full flex items-center p-3 rounded-lg hover:bg-red-50 text-red-600 transition-colors text-left">
-                  <TrashIcon className="w-5 h-5 text-red-500 mr-3" />
-                  <div>
-                    <div className="font-medium text-sm">Delete Account</div>
-                    <div className="text-xs text-red-400">Permanently delete your account</div>
-                  </div>
-                </button>
-              </div>
+      {/* Learning Insights Section - Full Width for better balance */}
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
+        <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b border-gray-50 pb-4">Learning Insights</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="relative group overflow-hidden p-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl text-white shadow-lg shadow-blue-500/10">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-5xl font-black mb-1">{user?.modulesCompleted || 0}</div>
+              <div className="text-blue-100 text-[10px] font-black uppercase tracking-[0.2em]">Modules Completed</div>
             </div>
           </div>
 
-          {/* Right Column - Achievements */}
-          <div>
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Achievements</h3>
-              <div className="grid grid-cols-1 gap-4">
-                {achievements.map((achievement) => (
-                  <div key={achievement.id} className="flex items-start space-x-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl hover:from-blue-50 hover:to-cyan-50 transition-colors">
-                    <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow-sm">
+          <div className="relative group overflow-hidden p-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl text-white shadow-lg shadow-emerald-500/10">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-5xl font-black mb-1">{user?.totalHours || 0}h</div>
+              <div className="text-emerald-100 text-[10px] font-black uppercase tracking-[0.2em]">Hours Invested</div>
+            </div>
+          </div>
+
+          <div className="relative group overflow-hidden p-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl text-white shadow-lg shadow-orange-500/10">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8"></div>
+            <div className="relative z-10 text-center">
+              <div className="text-5xl font-black mb-1">{user?.currentStreak || 0}</div>
+              <div className="text-orange-100 text-[10px] font-black uppercase tracking-[0.2em]">Day Streak</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column - Forms & Settings */}
+        <div className="lg:col-span-8 space-y-8">
+          {/* Edit Form */}
+          {isEditing && (
+            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 transform transition-all duration-300 scale-100 opacity-100">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b border-gray-50 pb-4">Personal Details</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">First Name</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">Last Name</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">Phone</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium"
+                    placeholder="+91 00000 00000"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">Date of Birth</label>
+                  <input
+                    type="date"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">Location</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium"
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-bold text-gray-700 ml-1">Bio</label>
+                  <textarea
+                    name="bio"
+                    rows="4"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-sm font-medium resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-10">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="px-6 py-2.5 rounded-xl font-bold text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all text-sm"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Account Settings */}
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b border-gray-50 pb-4">Security & Settings</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                onClick={() => handleAction('Privacy Settings')}
+                className="flex items-center p-4 rounded-2xl hover:bg-blue-50 border border-gray-50 transition-all text-left group"
+              >
+                <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mr-4 group-hover:bg-blue-600 transition-colors">
+                  <ShieldCheckIcon className="w-6 h-6 text-blue-600 group-hover:text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900 text-sm">Privacy Settings</div>
+                  <div className="text-xs text-gray-500">Manage your data visibility</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleAction('Notifications')}
+                className="flex items-center p-4 rounded-2xl hover:bg-indigo-50 border border-gray-50 transition-all text-left group"
+              >
+                <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center mr-4 group-hover:bg-indigo-600 transition-colors">
+                  <BellIcon className="w-6 h-6 text-indigo-600 group-hover:text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900 text-sm">Notifications</div>
+                  <div className="text-xs text-gray-500">Control alerts and updates</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleAction('Data Download')}
+                className="flex items-center p-4 rounded-2xl hover:bg-purple-50 border border-gray-50 transition-all text-left group"
+              >
+                <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mr-4 group-hover:bg-purple-600 transition-colors">
+                  <DocumentArrowDownIcon className="w-6 h-6 text-purple-600 group-hover:text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900 text-sm">Download Data</div>
+                  <div className="text-xs text-gray-500">Get a copy of your learning history</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleAction('Delete Account')}
+                className="flex items-center p-4 rounded-2xl hover:bg-red-50 border border-red-50 transition-all text-left group"
+              >
+                <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center mr-4 group-hover:bg-red-600 transition-colors">
+                  <TrashIcon className="w-6 h-6 text-red-600 group-hover:text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-red-600 text-sm">Delete Account</div>
+                  <div className="text-xs text-red-400">Permanently close your account</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Achievements */}
+        <div className="lg:col-span-4 space-y-8">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-2xl font-bold text-gray-900">Achievements</h3>
+              <span className="text-blue-600 text-sm font-bold bg-blue-50 px-3 py-1 rounded-full">{userAchievements.length}/15</span>
+            </div>
+            <div className="space-y-4">
+              {userAchievements.length > 0 ? (
+                userAchievements.map((achievement) => (
+                  <div key={achievement.id} className="flex items-start space-x-4 p-4 bg-gray-50/50 rounded-[2rem] border border-gray-50 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all group overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full -mr-8 -mt-8"></div>
+                    <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm z-10 shrink-0 transform group-hover:rotate-12 transition-transform duration-300">
                       {achievement.icon}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-gray-900 text-sm mb-1">{achievement.title}</h4>
-                      <p className="text-xs text-gray-600 mb-2">{achievement.description}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(achievement.date).toLocaleDateString()}
-                      </p>
+                    <div className="flex-1 min-w-0 z-10">
+                      <h4 className="font-bold text-gray-900 text-sm mb-1">{achievement.title}</h4>
+                      <p className="text-xs text-gray-600 leading-tight mb-2 opacity-80">{achievement.description}</p>
+                      <div className="flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <CalendarIcon className="w-3 h-3 mr-1" />
+                        {new Date(achievement.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                  <StarIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 font-bold">No achievements earned yet.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

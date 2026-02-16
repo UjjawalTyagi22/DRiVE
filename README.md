@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# DRiVE: Interactive Disaster Management Platform 🛡️
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+DRiVE is a comprehensive, interactive disaster management education platform designed to empower individuals with the knowledge and skills needed to respond effectively to natural disasters. It features structured learning modules for earthquakes, floods, and fire safety, tailored for different learning levels.
 
-## Available Scripts
+## 🚀 Key Features
 
-In the project directory, you can run:
+- **Interactive Modules**: Engaging lessons with progression tracking.
+- **Personalized Dashboard**: Monitor your learning journey and skills acquired.
+- **Multilevel Learning**: Content designed for Beginner, Intermediate, and Advanced stages.
+- **Profile Management**: Maintain your training records and certifications.
+- **Secure Authentication**: Robust user login and registration system.
 
-### `npm start`
+## 🛠️ Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React.js, Tailwind CSS, Lucide Icons, Axios.
+- **Backend**: Node.js, Express.js.
+- **Database**: MySQL with Sequelize ORM.
+- **Authentication**: JWT (JSON Web Tokens) & Bcrypt.js.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📦 Installation & Setup
 
-### `npm test`
+### Prerequisites
+- Node.js (v18 or higher)
+- MySQL Server
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/UjjawalTyagi22/drive-website.git
+cd drive-website
+```
 
-### `npm run build`
+### 2. Backend Setup
+```bash
+cd backend
+npm install
+```
+Create a `.env` file in the `backend` directory:
+```env
+DB_NAME=drive_db
+DB_USER=your_user
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=3306
+JWT_SECRET=your_super_secret_key
+NODE_ENV=development
+```
+Initialize the database:
+```bash
+npm start # Tables will auto-sync on first run
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 3. Frontend Setup
+```bash
+cd ..
+npm install
+```
+Create a `.env` file in the root directory:
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 4. Run the Application
+In separate terminals:
+- Backend: `cd backend && npm run dev`
+- Frontend: `npm start`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+Developed with ❤️ by [Ujjawal Tyagi](https://github.com/UjjawalTyagi22)

@@ -1,328 +1,199 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  MagnifyingGlassIcon, 
-  FunnelIcon,
-  UserCircleIcon, 
-  BellIcon,
-  ArrowRightOnRectangleIcon,
-  Bars3Icon,
-  XMarkIcon,
-  AcademicCapIcon
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  MagnifyingGlassIcon,
+  ChevronDownIcon,
+  CheckIcon
 } from '@heroicons/react/24/outline';
+import { FunnelIcon, AcademicCapIcon } from '@heroicons/react/24/solid';
 import ModuleCard from './ModuleCard';
+import Modal from './Modal';
+import { useAuth } from '../contexts/AuthContext';
+import { usersAPI } from '../api/users';
+import { modules as staticModules } from '../data/modules';
+
+const FilterDropdown = ({ label, value, options, onChange, icon: Icon }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedLabel = value === 'all'
+    ? `All ${label}`
+    : value.charAt(0).toUpperCase() + value.slice(1);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between px-5 py-3.5 bg-gray-50 border border-transparent hover:border-blue-200 hover:bg-white rounded-2xl transition-all duration-300 min-w-[180px] group ring-offset-2 focus:ring-2 focus:ring-blue-500 shadow-sm"
+      >
+        <div className="flex items-center space-x-3">
+          <Icon className="w-5 h-5 text-blue-600 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <span className="text-sm font-bold text-gray-700 truncate">{selectedLabel}</span>
+        </div>
+        <ChevronDownIcon className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white/90 backdrop-blur-xl border border-gray-100 rounded-2xl shadow-2xl shadow-blue-900/10 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="py-2">
+            {options.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => {
+                  onChange(opt);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-4 py-3 text-left text-sm font-medium transition-colors ${value === opt
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 hover:bg-blue-50 hover:text-blue-700'
+                  }`}
+              >
+                <span>{opt === 'all' ? `All ${label}` : opt.charAt(0).toUpperCase() + opt.slice(1)}</span>
+                {value === opt && <CheckIcon className="w-4 h-4 text-white" />}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ModulesPage = () => {
-  const [user] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    joinDate: "March 2024"
-  });
-
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterLevel, setFilterLevel] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [modules, setModules] = useState(staticModules);
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: UserCircleIcon },
-    { name: 'Modules', href: '/modules', icon: AcademicCapIcon },
-    { name: 'Profile', href: '/profile', icon: UserCircleIcon },
-  ];
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const stats = await usersAPI.getModuleStats();
+        if (stats.success) {
+          const updatedModules = staticModules.map(mod => ({
+            ...mod,
+            enrolled: (mod.baseEnrolled || 0) + (stats.data[mod.id] || 0)
+          }));
+          setModules(updatedModules);
+        }
+      } catch (error) {
+        console.error('Failed to fetch module stats:', error);
+      }
+    };
+    fetchStats();
+  }, []);
 
-  const handleLogout = () => {
-    window.location.href = '/';
+  const handleModuleClick = (module) => {
+    setSelectedModule(module);
   };
 
-  const allModules = [
-    {
-      id: 1,
-      title: "Earthquake Safety",
-      level: "intermediate",
-      category: "Natural Disasters",
-      description: "Learn drop, cover, and hold techniques, building evacuation, and post-earthquake safety measures.",
-      duration: "2 hours",
-      enrolled: "12.3K enrolled",
-      progress: 65,
-      image: "/api/placeholder/300/200",
-      color: "from-orange-400 to-red-500",
-      rating: 4.8,
-      lessons: 8
-    },
-    {
-      id: 2,
-      title: "Flood Response",
-      level: "beginner",
-      category: "Natural Disasters",
-      description: "Understanding flood warnings, evacuation routes, and water safety protocols for different scenarios.",
-      duration: "1.5 hours",
-      enrolled: "8.7K enrolled",
-      progress: 100,
-      image: "/api/placeholder/300/200",
-      color: "from-blue-400 to-cyan-500",
-      rating: 4.9,
-      lessons: 6
-    },
-    {
-      id: 3,
-      title: "Fire Safety",
-      level: "advanced",
-      category: "Emergency Response",
-      description: "Fire extinguisher usage, evacuation procedures, and smoke safety in buildings.",
-      duration: "3 hours",
-      enrolled: "15.1K enrolled",
-      progress: 30,
-      image: "/api/placeholder/300/200",
-      color: "from-red-400 to-orange-500",
-      rating: 4.7,
-      lessons: 12
-    },
-    {
-      id: 4,
-      title: "First Aid Basics",
-      level: "beginner",
-      category: "Medical Emergency",
-      description: "Essential first aid techniques, CPR basics, and emergency medical response procedures.",
-      duration: "2.5 hours",
-      enrolled: "20.4K enrolled",
-      progress: 0,
-      image: "/api/placeholder/300/200",
-      color: "from-green-400 to-emerald-500",
-      rating: 4.9,
-      lessons: 10
-    },
-    {
-      id: 5,
-      title: "Cyber Security Awareness",
-      level: "intermediate",
-      category: "Digital Safety",
-      description: "Protect yourself and your organization from cyber threats and data breaches.",
-      duration: "2 hours",
-      enrolled: "9.8K enrolled",
-      progress: 0,
-      image: "/api/placeholder/300/200",
-      color: "from-purple-400 to-indigo-500",
-      rating: 4.6,
-      lessons: 9
-    },
-    {
-      id: 6,
-      title: "Workplace Safety",
-      level: "intermediate",
-      category: "Professional Safety",
-      description: "Comprehensive workplace safety protocols, hazard identification, and emergency procedures.",
-      duration: "2.5 hours",
-      enrolled: "14.2K enrolled",
-      progress: 0,
-      image: "/api/placeholder/300/200",
-      color: "from-yellow-400 to-orange-500",
-      rating: 4.8,
-      lessons: 11
-    }
-  ];
+  const handleCloseModal = () => {
+    setSelectedModule(null);
+  };
 
   const categories = ['all', 'Natural Disasters', 'Emergency Response', 'Medical Emergency', 'Digital Safety', 'Professional Safety'];
   const levels = ['all', 'beginner', 'intermediate', 'advanced'];
 
-  const filteredModules = allModules.filter(module => {
+  const filteredModules = modules.filter(module => {
     const matchesSearch = module.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         module.description.toLowerCase().includes(searchTerm.toLowerCase());
+      module.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesLevel = filterLevel === 'all' || module.level === filterLevel;
-    const matchesCategory = filterCategory === 'all' || module.category === filterCategory;
-    
+    const matchesCategory = filterCategory === 'all' || module.category === filterCategory || !module.category; // Handle missing categories
+
     return matchesSearch && matchesLevel && matchesCategory;
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header - Same as Dashboard */}
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/dashboard" className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">D</span>
-                </div>
-                <span className="text-2xl font-bold text-gray-900">DRiVE</span>
-              </Link>
-              <span className="hidden md:block text-sm text-gray-500 ml-2">
-                Disaster Resilience in Virtual Education
-              </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    item.name === 'Modules' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-
-            {/* User Menu & Actions */}
-            <div className="flex items-center space-x-4">
-              <button className="relative p-2 text-gray-600 hover:text-blue-600 transition-colors">
-                <BellIcon className="w-6 h-6" />
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-              </button>
-
-              <div className="hidden md:flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                  <UserCircleIcon className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                  <p className="text-xs text-gray-500">Member since {user.joinDate}</p>
-                </div>
-              </div>
-
-              <button
-                onClick={handleLogout}
-                className="hidden md:flex items-center space-x-1 text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                <ArrowRightOnRectangleIcon className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
-
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 text-gray-700 hover:text-blue-600"
-              >
-                {isMobileMenuOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden border-t bg-white">
-              <div className="px-2 pt-2 pb-3 space-y-1">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`block px-3 py-2 rounded-md text-base font-medium ${
-                      item.name === 'Modules' ? 'text-blue-600 bg-blue-50' : 'text-gray-700 hover:text-blue-600'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
-                
-                {/* Mobile User Info */}
-                <div className="pt-4 pb-3 border-t border-gray-200">
-                  <div className="flex items-center px-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                      <UserCircleIcon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-base font-medium text-gray-800">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
-                    Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Learning Modules</h1>
-          <p className="text-gray-600">Explore our comprehensive disaster management and safety training modules</p>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="mb-8">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search modules..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Filters */}
-            <div className="flex gap-4">
-              <select
-                value={filterLevel}
-                onChange={(e) => setFilterLevel(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {levels.map(level => (
-                  <option key={level} value={level}>
-                    {level === 'all' ? 'All Levels' : level.charAt(0).toUpperCase() + level.slice(1)}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {categories.map(category => (
-                  <option key={category} value={category}>
-                    {category === 'all' ? 'All Categories' : category}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Results count */}
-          <div className="text-gray-600">
-            Showing {filteredModules.length} of {allModules.length} modules
-          </div>
-        </div>
-
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredModules.map((module) => (
-            <ModuleCard
-              key={module.id}
-              module={module}
-              onClick={() => {/* Handle module click */}}
-              showRating={true}
-            />
-          ))}
-        </div>
-
-        {filteredModules.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500 mb-4">
-              <FunnelIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl">No modules found</p>
-              <p>Try adjusting your search or filter criteria</p>
-            </div>
-          </div>
-        )}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Page Title */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Learning Modules</h1>
+        <p className="text-gray-600">Explore our comprehensive disaster management and safety training modules</p>
       </div>
+
+      {/* Search and Filters */}
+      <div className="mb-10 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1 relative">
+            <MagnifyingGlassIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by title or topic..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all font-medium text-sm"
+            />
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3">
+            <FilterDropdown
+              label="Levels"
+              value={filterLevel}
+              options={levels}
+              onChange={setFilterLevel}
+              icon={FunnelIcon}
+            />
+
+            <FilterDropdown
+              label="Categories"
+              value={filterCategory}
+              options={categories}
+              onChange={setFilterCategory}
+              icon={AcademicCapIcon}
+            />
+          </div>
+        </div>
+
+        {/* Results count */}
+        <div className="mt-4 text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center">
+          <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
+          Showing {filteredModules.length} of {modules.length} available modules
+        </div>
+      </div>
+
+      {/* Modules Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredModules.map((module) => (
+          <ModuleCard
+            key={module.id}
+            module={module}
+            onClick={handleModuleClick}
+            showRating={true}
+          />
+        ))}
+      </div>
+
+      {selectedModule && (
+        <Modal module={selectedModule} onClose={handleCloseModal} />
+      )}
+
+      {filteredModules.length === 0 && (
+        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+          <div className="text-gray-400">
+            <MagnifyingGlassIcon className="w-16 h-16 mx-auto mb-4 opacity-20" />
+            <p className="text-xl font-bold text-gray-900 mb-2">No modules found</p>
+            <p className="text-sm">Try adjusting your search terms or filters to find what you're looking for.</p>
+            <button
+              onClick={() => { setSearchTerm(''); setFilterLevel('all'); setFilterCategory('all'); }}
+              className="mt-6 text-blue-600 font-bold hover:underline"
+            >
+              Clear all filters
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,12 +1,14 @@
 {
-  "name": "drive-website",
-  "version": "0.1.0",
-  "private": true,
+  "name": "drive-disaster-management",
+  "version": "1.0.0",
+  "description": "Interactive disaster management education platform",
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.12.2",
+    "html2pdf.js": "^0.14.0",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -42,5 +44,7 @@
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"
-  }
+  },
+  "author": "Ujjawal Tyagi",
+  "license": "MIT"
 }
