@@ -12,7 +12,7 @@ DRiVE is a comprehensive, interactive disaster management education platform des
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React.js, Tailwind CSS, Lucide Icons, Axios.
+- **Frontend**: React.js, Tailwind CSS, Lucide React, Axios.
 - **Backend**: Node.js, Express.js.
 - **Database**: MySQL with Sequelize ORM.
 - **Authentication**: JWT (JSON Web Tokens) & Bcrypt.js.
@@ -36,12 +36,14 @@ npm install
 ```
 Create a `.env` file in the `backend` directory:
 ```env
+PORT=5000
 DB_NAME=drive_db
 DB_USER=your_user
 DB_PASSWORD=your_password
 DB_HOST=localhost
 DB_PORT=3306
 JWT_SECRET=your_super_secret_key
+FRONTEND_URL=http://localhost:3000
 NODE_ENV=development
 ```
 Initialize the database:
