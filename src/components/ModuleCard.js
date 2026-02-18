@@ -49,7 +49,7 @@ const ModuleCard = ({ module, onClick }) => {
       }}
     >
       {/* Module Image */}
-      <div className={`h-48 bg-gradient-to-br ${module.color} relative`}>
+      <div className={`h-48 ${module.color} relative`}>
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="absolute top-4 right-4">
           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(module.level)}`}>

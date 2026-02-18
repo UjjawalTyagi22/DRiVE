@@ -61,10 +61,23 @@ Create a `.env` file in the root directory:
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
-### 4. Run the Application
 In separate terminals:
 - Backend: `cd backend && npm run dev`
 - Frontend: `npm start`
+
+## 🛡️ Security & Verification
+
+We include a security check script to verify the integrity of the authentication system and profile protection.
+
+To run security tests:
+1. Ensure the backend is running.
+2. Execute:
+   ```bash
+   node backend/tests/securityCheck.js
+   ```
+
+> [!NOTE]
+> Database tables strictly auto-sync ONLY when `NODE_ENV` is set to `development`. In `production`, migrations should be handled manually to prevent data loss.
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

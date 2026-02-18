@@ -65,7 +65,7 @@ const ProgressPage = () => {
 
             <div className="w-full bg-gray-50 rounded-full h-4 mb-6 p-1 border border-gray-100">
               <div
-                className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-1000 min-w-[5%]"
+                className="bg-blue-600 h-2 rounded-full transition-all duration-1000 min-w-[5%]"
                 style={{ width: `${user?.overallProgress || 0}%` }}
               ></div>
             </div>

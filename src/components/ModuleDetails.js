@@ -86,7 +86,7 @@ const ModuleDetails = () => {
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
             {/* Module Header */}
-            <div className={`bg-gradient-to-r ${module.color} text-white pt-8 pb-16`}>
+            <div className={`${module.color} text-white pt-8 pb-16`}>
                 <div className="max-w-7xl mx-auto px-6">
                     <Link to="/modules" className="inline-flex items-center space-x-2 text-white/80 hover:text-white mb-8 transition-colors">
                         <ArrowLeft className="w-5 h-5" />
@@ -171,7 +171,7 @@ const ModuleDetails = () => {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/20">
+                        <div className="bg-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-indigo-500/20">
                             <Award className="w-12 h-12 mb-4 text-indigo-200" />
                             <h3 className="text-xl font-bold mb-2">Earn Your Certificate</h3>
                             <p className="text-indigo-100 text-sm leading-relaxed mb-6">

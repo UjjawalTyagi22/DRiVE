@@ -216,7 +216,7 @@ const UserProfile = () => {
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
         {/* Cover Photo */}
         <div
-          className="h-40 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden"
+          className="h-40 bg-blue-700 relative overflow-hidden"
           style={formData.coverPhoto ? { backgroundImage: `url(${formData.coverPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
         >
           <button
@@ -233,7 +233,7 @@ const UserProfile = () => {
             <div className="relative">
               <div className="w-32 h-32 bg-white rounded-3xl p-1 shadow-2xl">
                 <div
-                  className="w-full h-full bg-gradient-to-br from-blue-500 to-indigo-600 rounded-[1.25rem] flex items-center justify-center text-white text-4xl font-bold overflow-hidden"
+                  className="w-full h-full bg-blue-600 rounded-[1.25rem] flex items-center justify-center text-white text-4xl font-bold overflow-hidden"
                   style={formData.profilePhoto ? { backgroundImage: `url(${formData.profilePhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
                 >
                   {!formData.profilePhoto && (formData.firstName?.charAt(0) || <UserCircleIcon className="w-16 h-16" />)}
@@ -311,7 +311,7 @@ const UserProfile = () => {
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
         <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b border-gray-50 pb-4">Learning Insights</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="relative group overflow-hidden p-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl text-white shadow-lg shadow-blue-500/10">
+          <div className="relative group overflow-hidden p-8 bg-blue-700 rounded-3xl text-white shadow-lg">
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8"></div>
             <div className="relative z-10 text-center">
               <div className="text-5xl font-black mb-1">{user?.modulesCompleted || 0}</div>
@@ -319,7 +319,7 @@ const UserProfile = () => {
             </div>
           </div>
 
-          <div className="relative group overflow-hidden p-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl text-white shadow-lg shadow-emerald-500/10">
+          <div className="relative group overflow-hidden p-8 bg-emerald-600 rounded-3xl text-white shadow-lg">
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8"></div>
             <div className="relative z-10 text-center">
               <div className="text-5xl font-black mb-1">{user?.totalHours || 0}h</div>
@@ -327,7 +327,7 @@ const UserProfile = () => {
             </div>
           </div>
 
-          <div className="relative group overflow-hidden p-8 bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl text-white shadow-lg shadow-orange-500/10">
+          <div className="relative group overflow-hidden p-8 bg-orange-600 rounded-3xl text-white shadow-lg">
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-8 -mt-8"></div>
             <div className="relative z-10 text-center">
               <div className="text-5xl font-black mb-1">{user?.currentStreak || 0}</div>
@@ -435,7 +435,7 @@ const UserProfile = () => {
                 </button>
                 <button
                   onClick={handleSave}
-                  className="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all text-sm"
+                  className="px-8 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all text-sm"
                 >
                   Save Changes
                 </button>
@@ -513,7 +513,7 @@ const UserProfile = () => {
               {userAchievements.length > 0 ? (
                 userAchievements.map((achievement) => (
                   <div key={achievement.id} className="flex items-start space-x-4 p-4 bg-gray-50/50 rounded-[2rem] border border-gray-50 hover:bg-white hover:shadow-xl hover:shadow-blue-500/5 transition-all group overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-500/5 to-transparent rounded-full -mr-8 -mt-8"></div>
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-full -mr-8 -mt-8"></div>
                     <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm z-10 shrink-0 transform group-hover:rotate-12 transition-transform duration-300">
                       {achievement.icon}
                     </div>

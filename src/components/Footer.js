@@ -13,9 +13,9 @@ const Footer = () => {
         {/* SafeLearn Brand */}
         <div>
           <div className="flex items-center mb-4">
-            <span className="bg-blue-600 rounded-full p-2 mr-2">
-              <Shield className="w-6 h-6 text-white" />
-            </span>
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mr-2">
+              <span className="text-white font-bold text-xl">D</span>
+            </div>
             <span className="text-xl font-bold">DRiVE</span>
           </div>
           <p className="text-gray-300 mb-5">

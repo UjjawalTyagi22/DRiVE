@@ -8,7 +8,7 @@ export const modules = [
     baseEnrolled: 12300,
     progress: 0,
     image: "https://images.unsplash.com/photo-1510146754054-9721adcc29c5?auto=format&fit=crop&q=80&w=800",
-    color: "from-orange-400 to-red-500",
+    color: "bg-orange-600",
     category: "Natural Disasters",
     nextLesson: "Initial Assessment",
     timeRemaining: "2 hours",
@@ -50,7 +50,7 @@ export const modules = [
     baseEnrolled: 8700,
     progress: 0,
     image: "https://images.unsplash.com/photo-1547683908-21aa53d93a04?auto=format&fit=crop&q=80&w=800",
-    color: "from-blue-400 to-cyan-500",
+    color: "bg-blue-600",
     category: "Natural Disasters",
     nextLesson: "Introduction to Floods",
     timeRemaining: "1 hour",
@@ -82,7 +82,7 @@ export const modules = [
     baseEnrolled: 15100,
     progress: 0,
     image: "https://images.unsplash.com/photo-1516533037048-ad541e84f995?auto=format&fit=crop&q=80&w=800",
-    color: "from-red-400 to-orange-500",
+    color: "bg-red-600",
     category: "Emergency Response",
     nextLesson: "Basics of Fire Combustion",
     timeRemaining: "3 hours",
@@ -106,3 +106,4 @@ export const modules = [
     ]
   }
 ];
+

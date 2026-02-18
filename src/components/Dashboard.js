@@ -96,7 +96,7 @@ const Dashboard = () => {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Progress Overview */}
-          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl p-8 text-white shadow-lg">
+          <div className="bg-blue-600 rounded-2xl p-8 text-white shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="text-3xl font-bold mb-2">{user?.modulesCompleted || 0}</div>
@@ -136,7 +136,7 @@ const Dashboard = () => {
               {continueModulesList.map((module) => (
                 <div key={module.id} className="border border-gray-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group">
                   <div className="flex items-start justify-between mb-4">
-                    <div className={`w-12 h-12 bg-gradient-to-r ${module.color || 'from-blue-500 to-blue-600'} rounded-lg flex items-center justify-center`}>
+                    <div className={`w-12 h-12 ${module.color || 'bg-blue-600'} rounded-lg flex items-center justify-center`}>
                       <PlayCircleIcon className="w-6 h-6 text-white" />
                     </div>
                     <span className="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md">{module.progress || 0}%</span>
@@ -157,7 +157,7 @@ const Dashboard = () => {
 
                   <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
                     <div
-                      className={`h-2 rounded-full bg-gradient-to-r ${module.color || 'from-blue-500 to-blue-600'} transition-all duration-500`}
+                      className={`h-2 rounded-full ${module.color || 'bg-blue-600'} transition-all duration-500`}
                       style={{ width: `${module.progress || 0}%` }}
                     ></div>
                   </div>

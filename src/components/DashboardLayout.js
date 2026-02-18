@@ -42,7 +42,7 @@ const DashboardLayout = ({ children }) => {
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center">
                             <Link to="/dashboard" className="flex items-center space-x-2">
-                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                                     <span className="text-white font-bold text-xl">D</span>
                                 </div>
                                 <span className="text-2xl font-bold text-gray-900">DRiVE</span>
@@ -114,7 +114,7 @@ const DashboardLayout = ({ children }) => {
                                 to="/profile"
                                 className="hidden md:flex items-center space-x-3 hover:bg-gray-50 p-1.5 rounded-2xl transition-all group"
                             >
-                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm group-hover:shadow-md transition-all">
+                                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white overflow-hidden shadow-sm group-hover:shadow-md transition-all">
                                     {user?.profilePhoto ? (
                                         <img src={user.profilePhoto} alt="Profile" className="w-full h-full object-cover" />
                                     ) : (

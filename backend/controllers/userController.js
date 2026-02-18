@@ -35,8 +35,8 @@ const updateProfile = async (req, res) => {
             });
         }
 
-        // Update fields
-        const updatedUser = await user.update({
+        // Update fields - Restrict to non-sensitive fields to prevent privilege escalation
+        const allowedUpdates = {
             firstName: firstName || user.firstName,
             lastName: lastName || user.lastName,
             phone: phone || user.phone,
@@ -44,18 +44,11 @@ const updateProfile = async (req, res) => {
             location: location || user.location,
             bio: bio || user.bio,
             organization: organization || user.organization,
-            role: role || user.role,
             profilePhoto: profilePhoto || user.profilePhoto,
-            coverPhoto: coverPhoto || user.coverPhoto,
-            modulesCompleted: modulesCompleted !== undefined ? modulesCompleted : user.modulesCompleted,
-            totalHours: totalHours !== undefined ? totalHours : user.totalHours,
-            currentStreak: currentStreak !== undefined ? currentStreak : user.currentStreak,
-            totalPoints: totalPoints !== undefined ? totalPoints : user.totalPoints,
-            overallProgress: overallProgress !== undefined ? overallProgress : user.overallProgress,
-            moduleProgress: moduleProgress !== undefined ? (typeof moduleProgress === 'string' ? moduleProgress : JSON.stringify(moduleProgress)) : user.moduleProgress,
-            recentActivity: recentActivity !== undefined ? (typeof recentActivity === 'string' ? recentActivity : JSON.stringify(recentActivity)) : user.recentActivity,
-            lastAccessedModuleId: lastAccessedModuleId !== undefined ? lastAccessedModuleId : user.lastAccessedModuleId
-        });
+            coverPhoto: coverPhoto || user.coverPhoto
+        };
+
+        const updatedUser = await user.update(allowedUpdates);
 
         res.json({
             success: true,

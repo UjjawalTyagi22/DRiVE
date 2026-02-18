@@ -75,11 +75,11 @@ const Signup = () => {
   // Success Screen Component (unchanged)
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-cyan-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 text-center">
             {/* Success Icon */}
-            <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
@@ -105,7 +105,7 @@ const Signup = () => {
             <div className="space-y-4">
               <button
                 onClick={() => navigate('/login')}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
               >
                 Continue to Login
               </button>
@@ -125,7 +125,7 @@ const Signup = () => {
 
   // Original Signup Form (with password toggle)
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-blue-50 to-cyan-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       {/* Main Container */}
       <div className="w-full max-w-5xl">
         {/* Glassmorphism Card */}
@@ -133,7 +133,7 @@ const Signup = () => {
           <div className="flex flex-col lg:flex-row">
 
             {/* Left Panel - Illustration (unchanged) */}
-            <div className="lg:w-1/2 bg-gradient-to-br from-indigo-600 via-blue-700 to-blue-800 relative overflow-hidden rounded-l-3xl">
+            <div className="lg:w-1/2 bg-blue-700 relative overflow-hidden rounded-l-3xl">
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-12 right-10 w-20 h-20 bg-white rounded-full"></div>
@@ -151,7 +151,7 @@ const Signup = () => {
                     <div className="absolute -inset-4 bg-blue-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                     {/* Main circular container */}
-                    <div className="relative w-56 h-56 bg-gradient-to-br from-blue-500/20 to-blue-700/20 backdrop-blur-lg rounded-full overflow-hidden shadow-[0_20px_50px_rgba(30,58,138,0.4)] border-2 border-blue-400/30 transition-all duration-500 group-hover:shadow-[0_25px_60px_rgba(30,58,138,0.6)] group-hover:scale-105 flex items-center justify-center">
+                    <div className="relative w-56 h-56 bg-blue-500/10 backdrop-blur-lg rounded-full overflow-hidden shadow-[0_20px_50px_rgba(30,58,138,0.4)] border-2 border-blue-400/30 transition-all duration-500 group-hover:shadow-[0_25px_60px_rgba(30,58,138,0.6)] group-hover:scale-105 flex items-center justify-center">
                       {/* Icon */}
                       <img
                         src="/assets/emergency-siren.png"
@@ -162,8 +162,8 @@ const Signup = () => {
                         }}
                       />
 
-                      {/* Inner gradient overlay for depth */}
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-blue-900/20 rounded-full"></div>
+                      {/* Inner overlay for depth */}
+                      <div className="absolute inset-0 bg-blue-900/10 rounded-full"></div>
                     </div>
                   </div>
                 </div>
@@ -210,10 +210,8 @@ const Signup = () => {
                 {/* Header */}
                 <div className="text-center mb-6">
                   <div className="flex justify-center items-center mb-3">
-                    <div className="bg-blue-600 text-white p-2.5 rounded-2xl shadow-lg">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
+                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                      <span className="text-white font-bold text-xl">D</span>
                     </div>
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-1">Join DRiVE</h2>
@@ -395,7 +393,7 @@ const Signup = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
                   >
                     {loading ? (
                       <>

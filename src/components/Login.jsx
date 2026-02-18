@@ -44,7 +44,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       {/* Main Container - Made slightly smaller */}
       <div className="w-full max-w-5xl">
         {/* Glassmorphism Card */}
@@ -52,7 +52,7 @@ const Login = () => {
           <div className="flex flex-col lg:flex-row">
 
             {/* Left Panel - Illustration - Made more compact */}
-            <div className="lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 relative overflow-hidden rounded-l-3xl">
+            <div className="lg:w-1/2 bg-blue-700 relative overflow-hidden rounded-l-3xl">
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-8 left-8 w-28 h-28 bg-white rounded-full"></div>
@@ -70,7 +70,7 @@ const Login = () => {
                     <div className="absolute -inset-4 bg-blue-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
                     {/* Main circular container */}
-                    <div className="relative w-56 h-56 bg-gradient-to-br from-blue-500/20 to-blue-700/20 backdrop-blur-lg rounded-full overflow-hidden shadow-[0_20px_50px_rgba(30,58,138,0.4)] border-2 border-blue-400/30 transition-all duration-500 group-hover:shadow-[0_25px_60px_rgba(30,58,138,0.6)] group-hover:scale-105 flex items-center justify-center">
+                    <div className="relative w-56 h-56 bg-blue-500/10 backdrop-blur-lg rounded-full overflow-hidden shadow-[0_20px_50px_rgba(30,58,138,0.4)] border-2 border-blue-400/30 transition-all duration-500 group-hover:shadow-[0_25px_60px_rgba(30,58,138,0.6)] group-hover:scale-105 flex items-center justify-center">
                       {/* Icon */}
                       <img
                         src="/assets/emergency-siren.png"
@@ -81,14 +81,14 @@ const Login = () => {
                         }}
                       />
 
-                      {/* Inner gradient overlay for depth */}
-                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-blue-900/20 rounded-full"></div>
+                      {/* Inner overlay for depth */}
+                      <div className="absolute inset-0 bg-blue-900/10 rounded-full"></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Enhanced Text Content */}
-                <h1 className="text-3xl font-bold mb-5 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold mb-5 text-white">
                   Welcome Back to DRiVE
                 </h1>
                 <p className="text-lg text-blue-100 leading-relaxed max-w-sm mb-8 opacity-90">
@@ -102,21 +102,21 @@ const Login = () => {
                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
                       <div className="text-xl font-bold text-white group-hover:text-blue-100 transition-colors">50K+</div>
                       <div className="text-blue-200 text-xs font-medium mt-1">Students</div>
-                      <div className="w-6 h-0.5 bg-gradient-to-r from-blue-300 to-cyan-300 mx-auto mt-1.5 rounded-full"></div>
+                      <div className="w-6 h-0.5 bg-blue-400 mx-auto mt-1.5 rounded-full"></div>
                     </div>
                   </div>
                   <div className="group cursor-pointer">
                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
                       <div className="text-xl font-bold text-white group-hover:text-blue-100 transition-colors">500+</div>
                       <div className="text-blue-200 text-xs font-medium mt-1">Schools</div>
-                      <div className="w-6 h-0.5 bg-gradient-to-r from-emerald-300 to-teal-300 mx-auto mt-1.5 rounded-full"></div>
+                      <div className="w-6 h-0.5 bg-emerald-400 mx-auto mt-1.5 rounded-full"></div>
                     </div>
                   </div>
                   <div className="group cursor-pointer">
                     <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-3 text-center border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
                       <div className="text-xl font-bold text-white group-hover:text-blue-100 transition-colors">95%</div>
                       <div className="text-blue-200 text-xs font-medium mt-1">Success</div>
-                      <div className="w-6 h-0.5 bg-gradient-to-r from-purple-300 to-pink-300 mx-auto mt-1.5 rounded-full"></div>
+                      <div className="w-6 h-0.5 bg-purple-400 mx-auto mt-1.5 rounded-full"></div>
                     </div>
                   </div>
                 </div>
@@ -129,10 +129,8 @@ const Login = () => {
                 {/* Header */}
                 <div className="text-center mb-7">
                   <div className="flex justify-center items-center mb-4">
-                    <div className="bg-blue-600 text-white p-3 rounded-2xl shadow-lg">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                      </svg>
+                    <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                      <span className="text-white font-bold text-2xl">D</span>
                     </div>
                   </div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Sign In</h2>
@@ -188,7 +186,7 @@ const Login = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-blue-400 disabled:to-indigo-400 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center"
                   >
                     {loading ? (
                       <>

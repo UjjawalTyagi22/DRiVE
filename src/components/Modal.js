@@ -44,7 +44,7 @@ const Modal = ({ module, onClose }) => {
             </button>
           </div>
 
-          <div className={`h-48 bg-gradient-to-br ${module.color} rounded-xl mb-6`}></div>
+          <div className={`h-48 ${module.color} rounded-xl mb-6`}></div>
 
           <p className="text-gray-700 mb-6 leading-relaxed">
             {module.description}
