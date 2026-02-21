@@ -13,10 +13,8 @@ const Header = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg">
-              <span className="text-white font-bold text-xl">D</span>
-            </div>
-            <span className="text-2xl font-bold text-gray-900">DRiVE</span>
+         <img src="/logo192.png" alt="DRiVE Logo" className="w-10 h-10 object-contain" />
+<span className="text-2xl font-bold text-gray-900">DRiVE</span>
           </Link>
 
           {/* Desktop Navigation */}
