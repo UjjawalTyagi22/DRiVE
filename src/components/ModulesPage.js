@@ -175,6 +175,39 @@ const ModulesPage = () => {
         ))}
       </div>
 
+      {/* More Modules Coming Soon Section */}
+      <div className="mt-12 mb-8">
+        <div className="relative overflow-hidden bg-gray-900 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl border border-gray-800">
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="text-center md:text-left">
+              <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 text-white text-xs font-black uppercase tracking-widest mb-4 border border-white/20">
+                Curriculum Roadmap
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black mb-4 leading-tight text-white">
+                9 More Modules <br />
+                <span>Coming Soon</span>
+              </h2>
+              <p className="text-gray-300 text-sm md:text-base max-w-lg leading-relaxed font-medium">
+                We're currently developing the remaining phases of our 12-module safety curriculum.
+                Stay tuned for upcoming training on Medical Emergencies, Digital Safety, and more.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-center justify-center text-center group hover:bg-white/10 transition-all cursor-default w-24 h-24 sm:w-28 sm:h-28">
+                  <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center mb-2">
+                    <div className="w-1.5 h-1.5 bg-white/40 rounded-full"></div>
+                  </div>
+                  <div className="h-2 w-12 bg-white/20 rounded-full mb-1"></div>
+                  <div className="h-1.5 w-8 bg-white/10 rounded-full"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {selectedModule && (
         <Modal module={selectedModule} onClose={handleCloseModal} />
       )}

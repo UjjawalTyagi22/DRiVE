@@ -2,7 +2,7 @@
 
 DRiVE is a comprehensive, interactive disaster management education platform designed to empower individuals with the knowledge and skills needed to respond effectively to natural disasters. It features structured learning modules for earthquakes, floods, and fire safety, tailored for different learning levels.
 
-## 🚀 Key Features
+##  Key Features
 
 - **Interactive Modules**: Engaging lessons with progression tracking.
 - **Personalized Dashboard**: Monitor your learning journey and skills acquired.
@@ -10,14 +10,14 @@ DRiVE is a comprehensive, interactive disaster management education platform des
 - **Profile Management**: Maintain your training records and certifications.
 - **Secure Authentication**: Robust user login and registration system.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Frontend**: React.js, Tailwind CSS, Lucide React, Axios.
 - **Backend**: Node.js, Express.js.
 - **Database**: MySQL with Sequelize ORM.
 - **Authentication**: JWT (JSON Web Tokens) & Bcrypt.js.
 
-## 📦 Installation & Setup
+##  Installation & Setup
 
 ### Prerequisites
 - Node.js (v18 or higher)

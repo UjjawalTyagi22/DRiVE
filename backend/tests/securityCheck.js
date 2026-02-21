@@ -17,11 +17,12 @@ async function runSecurityChecks() {
                 firstName: 'Test',
                 lastName: 'User',
                 email: 'invalid-email',
-                password: '123'
+                password: '123',
+                phone: 'abc' // Invalid phone
             });
-            console.log('❌ FAIL: Accepted invalid email/password');
+            console.log('❌ FAIL: Accepted invalid email/password/phone');
         } catch (error) {
-            console.log('✅ PASS: Rejected invalid registration data');
+            console.log('✅ PASS: Rejected invalid registration data (Email/Password/Phone)');
         }
 
         // 2. Register valid user

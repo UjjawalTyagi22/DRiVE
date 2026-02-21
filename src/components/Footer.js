@@ -64,7 +64,7 @@ const Footer = () => {
       </div>
       {/* Bottom copyright area */}
       <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-400 text-sm">
-        © 2024 SafeLearn. All rights reserved. Making education safer, one student at a time.
+        © 2026 DRiVE. All rights reserved.
       </div>
     </footer>
   );

@@ -41,6 +41,17 @@ const register = async (req, res) => {
       });
     }
 
+    // Phone validation (Optional but must be a valid 10-digit number starting with 7, 8, or 9)
+    if (phone) {
+      const phoneRegex = /^[7-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Phone number must start with 7, 8, or 9 and be exactly 10 digits'
+        });
+      }
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {

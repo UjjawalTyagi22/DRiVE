@@ -78,8 +78,6 @@ export const AuthProvider = ({ children }) => {
       if (response.success) {
         // 🔥 MODIFIED: Don't auto-login after signup
         // Just return success without setting user/auth state
-        // setUser(response.data.user);         // ❌ Removed
-        // setIsAuthenticated(true);            // ❌ Removed
         localStorage.setItem('user', JSON.stringify(response.data.user));
         return { success: true, user: response.data.user }; // ✅ Return user data for success message
       } else {
@@ -126,10 +124,15 @@ export const AuthProvider = ({ children }) => {
     try {
       if (!user) return { success: false, message: 'User not authenticated' };
 
-      const currentProgress = Array.isArray(user.moduleProgress) ? user.moduleProgress : (user.moduleProgress ? JSON.parse(user.moduleProgress) : []);
+      // IMMUTABLE CLONE: Avoid direct state mutation
+      const currentProgress = Array.isArray(user.moduleProgress)
+        ? JSON.parse(JSON.stringify(user.moduleProgress))
+        : (user.moduleProgress ? JSON.parse(user.moduleProgress) : []);
 
-      // Find the module in progress
-      let moduleIdx = currentProgress.findIndex(m => m.id === moduleId);
+      console.log('--- Syncing Progress ---', { moduleTitle, moduleId, lessonName, isCompleted });
+
+      // Find the module in progress (robust id comparison)
+      let moduleIdx = currentProgress.findIndex(m => String(m.id) === String(moduleId));
       let updatedModule;
 
       if (moduleIdx === -1) {
@@ -139,57 +142,58 @@ export const AuthProvider = ({ children }) => {
           title: moduleTitle,
           category: category || 'General',
           progress: 0,
-          score: 0,
-          timeSpent: '0m',
-          lessons: [{ name: lessonName, completed: isCompleted, score: isCompleted ? 100 : 0 }]
+          lessons: [{ name: lessonName, completed: isCompleted }]
         };
         currentProgress.push(updatedModule);
         moduleIdx = currentProgress.length - 1;
       } else {
         // Update existing entry
         updatedModule = { ...currentProgress[moduleIdx] };
+
+        // Ensure lessons array exists
+        if (!Array.isArray(updatedModule.lessons)) {
+          updatedModule.lessons = [];
+        }
+
         const lessonIdx = updatedModule.lessons.findIndex(l => l.name === lessonName);
 
         if (lessonIdx === -1) {
-          updatedModule.lessons.push({ name: lessonName, completed: isCompleted, score: isCompleted ? 100 : 0 });
+          updatedModule.lessons.push({ name: lessonName, completed: isCompleted });
         } else {
           updatedModule.lessons[lessonIdx] = {
             ...updatedModule.lessons[lessonIdx],
-            completed: isCompleted,
-            score: isCompleted ? 100 : 0
+            completed: isCompleted
           };
         }
         currentProgress[moduleIdx] = updatedModule;
       }
 
-      // Calculate module progress
+      // Calculate module progress using the actual total lessons from the data source
       const completedCount = updatedModule.lessons.filter(l => l.completed).length;
-      // Note: In a real app, we'd know total lessons. Here we use current lessons length.
-      // But actually, we should probably pass the expected total lessons or calculate based on the data/modules.js
-      // For now, let's assume the passed lessons in the array are all there is or we'll update it later.
-      updatedModule.progress = Math.round((completedCount / updatedModule.lessons.length) * 100);
+      const moduleData = allModules.find(m => String(m.id) === String(moduleId));
+      const totalLessonsInModule = moduleData ? moduleData.lessons.length : updatedModule.lessons.length;
 
-      // Calculate overall progress (percentage of 12 total modules as used in ProgressPage)
+      updatedModule.progress = Math.round((completedCount / totalLessonsInModule) * 100);
+
+      console.log('Progress Update:', { completedCount, totalLessonsInModule, progress: updatedModule.progress });
+
+      // Calculate overall stats
       const modulesCompletedCount = currentProgress.filter(m => m.progress === 100).length;
       const overallProgress = Math.min(100, Math.round((modulesCompletedCount / 12) * 100));
 
-      // Calculate total points (e.g., 100 points per completed lesson)
       const totalPoints = currentProgress.reduce((sum, mod) => {
-        return sum + mod.lessons.filter(l => l.completed).length * 100;
+        return sum + (mod.lessons?.filter(l => l.completed).length || 0) * 100;
       }, 0);
 
-      // Calculate total hours based on module durations and progress
       const totalHours = Math.round(currentProgress.reduce((sum, mod) => {
-        const moduleData = allModules.find(m => m.id === mod.id);
-        if (moduleData) {
-          const duration = parseInt(moduleData.duration) || 0;
+        const mData = allModules.find(sm => String(sm.id) === String(mod.id));
+        if (mData) {
+          const duration = parseInt(mData.duration) || 0;
           return sum + (mod.progress / 100) * duration;
         }
         return sum;
       }, 0));
 
-      // Prepare updated user data
-      // Update recent activity
       const newActivity = {
         id: Date.now(),
         type: updatedModule.progress === 100 ? 'completed' : 'started',
@@ -199,7 +203,7 @@ export const AuthProvider = ({ children }) => {
       };
 
       const currentActivity = Array.isArray(user.recentActivity) ? user.recentActivity : (user.recentActivity ? JSON.parse(user.recentActivity) : []);
-      const updatedActivity = [newActivity, ...currentActivity].slice(0, 5);
+      const updatedActivity = [newActivity, ...currentActivity.filter(a => a.module !== moduleTitle)].slice(0, 5);
 
       const updatedData = {
         moduleProgress: currentProgress,

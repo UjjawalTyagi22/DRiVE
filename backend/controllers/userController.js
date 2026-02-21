@@ -36,16 +36,26 @@ const updateProfile = async (req, res) => {
         }
 
         // Update fields - Restrict to non-sensitive fields to prevent privilege escalation
+        // Note: Progress-related fields are allowed so the frontend learning logic can sync data.
         const allowedUpdates = {
-            firstName: firstName || user.firstName,
-            lastName: lastName || user.lastName,
-            phone: phone || user.phone,
-            dateOfBirth: dateOfBirth || user.dateOfBirth,
-            location: location || user.location,
-            bio: bio || user.bio,
-            organization: organization || user.organization,
-            profilePhoto: profilePhoto || user.profilePhoto,
-            coverPhoto: coverPhoto || user.coverPhoto
+            firstName: firstName !== undefined ? firstName : user.firstName,
+            lastName: lastName !== undefined ? lastName : user.lastName,
+            phone: phone !== undefined ? phone : user.phone,
+            dateOfBirth: dateOfBirth !== undefined ? dateOfBirth : user.dateOfBirth,
+            location: location !== undefined ? location : user.location,
+            bio: bio !== undefined ? bio : user.bio,
+            organization: organization !== undefined ? organization : user.organization,
+            profilePhoto: profilePhoto !== undefined ? profilePhoto : user.profilePhoto,
+            coverPhoto: coverPhoto !== undefined ? coverPhoto : user.coverPhoto,
+            // Learning progress fields
+            modulesCompleted: modulesCompleted !== undefined ? modulesCompleted : user.modulesCompleted,
+            totalHours: totalHours !== undefined ? totalHours : user.totalHours,
+            currentStreak: currentStreak !== undefined ? currentStreak : user.currentStreak,
+            totalPoints: totalPoints !== undefined ? totalPoints : user.totalPoints,
+            overallProgress: overallProgress !== undefined ? overallProgress : user.overallProgress,
+            moduleProgress: moduleProgress !== undefined ? JSON.stringify(moduleProgress) : user.moduleProgress,
+            recentActivity: recentActivity !== undefined ? JSON.stringify(recentActivity) : user.recentActivity,
+            lastAccessedModuleId: lastAccessedModuleId !== undefined ? lastAccessedModuleId : user.lastAccessedModuleId
         };
 
         const updatedUser = await user.update(allowedUpdates);

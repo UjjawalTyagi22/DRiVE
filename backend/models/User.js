@@ -43,7 +43,14 @@ const User = sequelize.define('User', {
   },
   phone: {
     type: DataTypes.STRING,
-    allowNull: true
+    allowNull: true,
+    validate: {
+      isTenDigits(value) {
+        if (value && !/^[7-9]\d{9}$/.test(value)) {
+          throw new Error('Phone number must start with 7, 8, or 9 and be exactly 10 digits');
+        }
+      }
+    }
   },
   dateOfBirth: {
     type: DataTypes.DATEONLY,
