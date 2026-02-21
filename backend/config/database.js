@@ -28,13 +28,9 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ MySQL Database connection successful!');
 
-    // Sync models (create tables) - Only in non-production environments
-    if (process.env.NODE_ENV !== 'production') {
-      await sequelize.sync({ alter: true });
-      console.log('✅ MySQL Database tables synchronized!');
-    } else {
-      console.log('⚠️ Skipping database sync in production mode.');
-    }
+    // Sync models (create tables if not exist) - safe for both local and production
+    await sequelize.sync();
+    console.log('✅ MySQL Database tables synchronized!');
 
   } catch (error) {
     console.error('❌ MySQL Database connection failed:', error.message);
