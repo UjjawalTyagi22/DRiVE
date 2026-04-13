@@ -18,6 +18,11 @@ const sequelize = new Sequelize(
       min: 0,
       acquire: 30000,
       idle: 10000
+    },
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: true
+      }
     }
   }
 );
@@ -28,7 +33,6 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('✅ MySQL Database connection successful!');
 
-    // Sync models (create tables if not exist) - safe for both local and production
     await sequelize.sync();
     console.log('✅ MySQL Database tables synchronized!');
 
